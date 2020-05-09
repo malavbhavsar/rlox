@@ -37,13 +37,13 @@ class Rlox
     end
   end
 
+  def self.error(line, message)
+    report(line, "", message)
+  end
+
   private_class_method def self.run(code)
     scanner = Scanner.new(code)
     scanner.scan_tokens.each { |token| p token }
-  end
-
-  private_class_method def self.error(line, message)
-    report(line, "", message)
   end
 
   private_class_method def self.report(line, where, message)

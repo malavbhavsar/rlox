@@ -62,6 +62,8 @@ class Scanner
       add_token(Token::TYPE[:SEMICOLON])
     when '*'
       add_token(Token::TYPE[:STAR])
+    else
+      Rlox.error(line, "Unexpected character #{char}")
     end
   end
 end
