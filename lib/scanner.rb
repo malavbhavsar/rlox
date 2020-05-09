@@ -28,6 +28,11 @@ class Scanner
     current >= source.length
   end
 
+  def peek
+    return '\0' if is_at_end?
+    source[current]
+  end
+
   def advance
     self.current += 1
     source[current-1]
@@ -70,6 +75,10 @@ class Scanner
       add_token(Token::TYPE[:SEMICOLON])
     when '*'
       add_token(Token::TYPE[:STAR])
+    when '#' # I like Ruby style comments
+      while peek != "\n" && !is_at_end? # Note: "\n" != '\n'
+        advance
+      end
     when '!'
       add_token(second_char_match?('=') ? Token::TYPE[:BANG_EQUAL] : Token::TYPE[:BANG])
     when '='
@@ -78,6 +87,14 @@ class Scanner
       add_token(second_char_match?('=') ? Token::TYPE[:LESS_EQUAL] : Token::TYPE[:LESS])
     when '>'
       add_token(second_char_match?('=') ? Token::TYPE[:GREATER_EQUAL] : Token::TYPE[:GREATER])
+    when '/'
+      if second_char_match?('/')
+        while peek != "\n" && !is_at_end? # Note: "\n" != '\n'
+          advance
+        end
+      else
+        add_token(Token::TYPE[:SLASH])
+      end
     else
       Rlox.error(line, "Unexpected character #{char}")
     end

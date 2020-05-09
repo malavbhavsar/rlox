@@ -2,6 +2,7 @@
 
 require 'readline'
 require 'singleton'
+require 'byebug'
 
 require File.expand_path("../scanner", __FILE__)
 require File.expand_path("../token", __FILE__)
