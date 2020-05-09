@@ -24,13 +24,13 @@ class Scanner
 
   private
 
-  def is_at_end?
-    current >= source.length
+  def is_at_end?(offset = 0)
+    (current + offset) >= source.length
   end
 
-  def peek
-    return '\0' if is_at_end?
-    source[current]
+  def peek(offset = 0)
+    return '\0' if is_at_end?(offset)
+    source[current + offset]
   end
 
   def advance
@@ -88,6 +88,8 @@ class Scanner
       self.line += 1
     when '"'
       string
+    when *(0..9).map(&:to_s)
+      number
     else
       Rlox.error(line, "Unexpected character #{char}")
     end
@@ -120,5 +122,26 @@ class Scanner
     # trim the surrounding quotes
     literal = source[(start+1)...(current-1)]
     add_token(Token::TYPE[:STRING], literal)
+  end
+
+  def number
+    advance while is_digit?(peek)
+
+    if peek == '.' && is_digit?(peek(1))
+      # consume '.'
+      advance
+
+      advance while is_digit?(peek)
+
+      add_token(Token::TYPE[:NUMBER], source[start...current].to_f)
+    else
+      add_token(Token::TYPE[:NUMBER], source[start...current].to_i)
+    end
+
+
+  end
+
+  def is_digit?(char)
+    char >= '0' && char <= '9'
   end
 end
