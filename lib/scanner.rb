@@ -33,6 +33,14 @@ class Scanner
     source[current-1]
   end
 
+  def second_char_match?(expected)
+    return false if is_at_end?
+    return false unless source[current] == expected
+
+    self.current += 1
+    true
+  end
+
   def add_token(type, literal = nil)
     text = source[start...current]
     tokens << Token.new(type, text, literal, line)
@@ -62,6 +70,14 @@ class Scanner
       add_token(Token::TYPE[:SEMICOLON])
     when '*'
       add_token(Token::TYPE[:STAR])
+    when '!'
+      add_token(second_char_match?('=') ? Token::TYPE[:BANG_EQUAL] : Token::TYPE[:BANG])
+    when '='
+      add_token(second_char_match?('=') ? Token::TYPE[:EQUAL_EQUAL] : Token::TYPE[:EQUAL])
+    when '<'
+      add_token(second_char_match?('=') ? Token::TYPE[:LESS_EQUAL] : Token::TYPE[:LESS])
+    when '>'
+      add_token(second_char_match?('=') ? Token::TYPE[:GREATER_EQUAL] : Token::TYPE[:GREATER])
     else
       Rlox.error(line, "Unexpected character #{char}")
     end
