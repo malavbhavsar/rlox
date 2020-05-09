@@ -12,4 +12,5 @@ when 1
   Rlox.run_file(ARGV[0])
 else
   Rlox.print_usage
+  exit(64)
 end
