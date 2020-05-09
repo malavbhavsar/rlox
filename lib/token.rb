@@ -33,6 +33,6 @@ class Token
   end
 
   def to_s
-    "#{type} #{lexeme} #{literal}"
+    "#{TYPE.invert[type]} #{lexeme} #{literal}"
   end
 end

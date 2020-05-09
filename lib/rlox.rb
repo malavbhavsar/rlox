@@ -44,11 +44,11 @@ class Rlox
 
   private_class_method def self.run(code)
     scanner = Scanner.new(code)
-    scanner.scan_tokens.each { |token| p token }
+    scanner.scan_tokens.each { |token| puts token }
   end
 
   private_class_method def self.report(line, where, message)
-    p "[line #{line}] Error #{where}: #{message}"
+    puts "[line #{line}] Error #{where}: #{message}"
     HadError.instance.value = true
   end
 end

@@ -95,6 +95,10 @@ class Scanner
       else
         add_token(Token::TYPE[:SLASH])
       end
+    when ' ', "\r", "\t"
+      # no op
+    when "\n"
+      self.line += 1
     else
       Rlox.error(line, "Unexpected character #{char}")
     end
