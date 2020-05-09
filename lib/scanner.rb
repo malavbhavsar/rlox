@@ -38,19 +38,6 @@ class Scanner
     source[current-1]
   end
 
-  def second_char_match?(expected)
-    return false if is_at_end?
-    return false unless source[current] == expected
-
-    self.current += 1
-    true
-  end
-
-  def add_token(type, literal = nil)
-    text = source[start...current]
-    tokens << Token.new(type, text, literal, line)
-  end
-
   def scan_token
     char = advance
 
@@ -99,8 +86,39 @@ class Scanner
       # no op
     when "\n"
       self.line += 1
+    when '"'
+      string
     else
       Rlox.error(line, "Unexpected character #{char}")
     end
+  end
+
+  def second_char_match?(expected)
+    return false if is_at_end?
+    return false unless source[current] == expected
+
+    self.current += 1
+    true
+  end
+
+  def add_token(type, literal = nil)
+    text = source[start...current]
+    tokens << Token.new(type, text, literal, line)
+  end
+
+  def string
+    while peek != '"' && !is_at_end?
+      self.line += 1 if peek == "\n"
+      advance
+    end
+
+    Rlox.error(line, "Untemrinated string.") if is_at_end?
+
+    # closing "
+    advance
+
+    # trim the surrounding quotes
+    literal = source[(start+1)...(current-1)]
+    add_token(Token::TYPE[:STRING], literal)
   end
 end
