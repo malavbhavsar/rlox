@@ -2,7 +2,9 @@
 
 require 'readline'
 require 'singleton'
+
 require File.expand_path("../scanner", __FILE__)
+require File.expand_path("../token", __FILE__)
 
 class Rlox
   class HadError
