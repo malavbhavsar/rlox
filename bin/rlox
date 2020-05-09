@@ -1,0 +1,15 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Usage: rlox [FILE]
+
+require File.expand_path("../../lib/rlox", __FILE__)
+
+case ARGV.count
+when 0
+  Rlox.run_prompt
+when 1
+  Rlox.run_file(ARGV[0])
+else
+  Rlox.print_usage
+end
