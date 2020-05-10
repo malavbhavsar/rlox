@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 class Scanner
+  DIGITS = (0..9).map(&:to_s)
+  ALPHAS = ('a'..'z').to_a + ('A'..'Z').to_a + ['_']
+
   attr_accessor :source, :tokens, :start, :current, :line
 
   def initialize(source)
@@ -88,8 +91,10 @@ class Scanner
       self.line += 1
     when '"'
       string
-    when *(0..9).map(&:to_s)
+    when *DIGITS
       number
+    when *ALPHAS
+      identifier
     else
       Rlox.error(line, "Unexpected character #{char}")
     end
@@ -137,11 +142,24 @@ class Scanner
     else
       add_token(Token::TYPE[:NUMBER], source[start...current].to_i)
     end
+  end
 
+  def identifier
+    advance while is_alphanumeric? peek
 
+    type_sym = Token::RESERVED_KEYWORD_LEXEME_TO_TYPE[source[start...current]] || :IDENTIFIER
+    add_token(Token::TYPE[type_sym])
   end
 
   def is_digit?(char)
     char >= '0' && char <= '9'
+  end
+
+  def is_alpha?(char)
+    (char >= 'a' && char <= 'z') || char >= 'A' && char <= 'Z' || char == '_'
+  end
+
+  def is_alphanumeric?(char)
+    is_digit?(char) || is_alpha?(char)
   end
 end
