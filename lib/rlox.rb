@@ -4,8 +4,29 @@ require 'readline'
 require 'singleton'
 require 'byebug'
 
+require File.expand_path("../internals/util", __FILE__)
 require File.expand_path("../scanner", __FILE__)
 require File.expand_path("../token", __FILE__)
+require File.expand_path("../grammer", __FILE__)
+require File.expand_path("../expr", __FILE__)
+
+# Hacky test for AstPrinter
+#
+# require File.expand_path("../visitor", __FILE__)
+# require File.expand_path("../ast_printer", __FILE__)
+#
+# expression = Expr::Binary.new(
+#                Expr::Unary.new(
+#                  Token.new(Token::TYPE[:STAR], "-", nil, 1),
+#                  Expr::Literal.new(123)
+#                ),
+#                Token.new(Token::TYPE[:STAR], "*", nil, 1),
+#                Expr::Grouping.new(
+#                  Expr::Literal.new(45.67)
+#                )
+#              )
+#
+# puts AstPrinter.new.print(expression)
 
 class Rlox
   class HadError
