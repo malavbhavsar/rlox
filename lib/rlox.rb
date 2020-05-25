@@ -9,24 +9,9 @@ require File.expand_path("../scanner", __FILE__)
 require File.expand_path("../token", __FILE__)
 require File.expand_path("../grammer", __FILE__)
 require File.expand_path("../expr", __FILE__)
-
-# Hacky test for AstPrinter
-#
-# require File.expand_path("../visitor", __FILE__)
-# require File.expand_path("../ast_printer", __FILE__)
-#
-# expression = Expr::Binary.new(
-#                Expr::Unary.new(
-#                  Token.new(Token::TYPE[:STAR], "-", nil, 1),
-#                  Expr::Literal.new(123)
-#                ),
-#                Token.new(Token::TYPE[:STAR], "*", nil, 1),
-#                Expr::Grouping.new(
-#                  Expr::Literal.new(45.67)
-#                )
-#              )
-#
-# puts AstPrinter.new.print(expression)
+require File.expand_path("../parser", __FILE__)
+require File.expand_path("../visitor", __FILE__)
+require File.expand_path("../ast_printer", __FILE__)
 
 class Rlox
   class HadError
@@ -59,17 +44,35 @@ class Rlox
     end
   end
 
-  def self.error(line, message)
-    report(line, "", message)
+  def self.error(line_or_token, message)
+    if line_or_token.is_a?(Token)
+      token = line_or_token
+      line = token.line
+      where = if token.type == Token::TYPE[:EOF]
+        " at end"
+      else
+        " at '#{token.lexeme}'"
+      end
+    else
+      line = line_or_token
+      where = ""
+    end
+    report(line, where, message)
   end
 
   private_class_method def self.run(code)
     scanner = Scanner.new(code)
-    scanner.scan_tokens.each { |token| puts token }
+    tokens = scanner.scan_tokens
+    parser = Parser.new(tokens)
+    expression = parser.parse
+
+    return if HadError.instance.value
+
+    puts AstPrinter.new.print(expression)
   end
 
   private_class_method def self.report(line, where, message)
-    puts "[line #{line}] Error #{where}: #{message}"
+    puts "[line #{line}] Error#{where}: #{message}"
     HadError.instance.value = true
   end
 end

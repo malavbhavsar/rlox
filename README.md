@@ -8,4 +8,6 @@ in Ruby 💎.
 
 ✅ Read and Implement [V1 of AST printing](https://craftinginterpreters.com/representing-code.html)
 
-🤓 Read and Implement [V1 of Parsing and AST generation](https://craftinginterpreters.com/parsing-expressions.html)
+✅ Read and Implement [V1 of Parsing and AST generation](https://craftinginterpreters.com/parsing-expressions.html)
+
+🤓 Read and Implement [V1 of Evaluating Expression](https://craftinginterpreters.com/evaluating-expressions.html)
