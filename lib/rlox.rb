@@ -12,6 +12,7 @@ require File.expand_path("../expr", __FILE__)
 require File.expand_path("../parser", __FILE__)
 require File.expand_path("../visitor", __FILE__)
 require File.expand_path("../ast_printer", __FILE__)
+require File.expand_path("../interpreter", __FILE__)
 
 class Rlox
   class HadError
@@ -68,7 +69,9 @@ class Rlox
 
     return if HadError.instance.value
 
-    puts AstPrinter.new.print(expression)
+    puts "AST: #{AstPrinter.new.print(expression)}"
+
+    puts Interpreter.new.evaluate(expression)
   end
 
   private_class_method def self.report(line, where, message)
