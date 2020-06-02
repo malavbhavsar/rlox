@@ -13,9 +13,20 @@ require File.expand_path("../parser", __FILE__)
 require File.expand_path("../visitor", __FILE__)
 require File.expand_path("../ast_printer", __FILE__)
 require File.expand_path("../interpreter", __FILE__)
+require File.expand_path("../rlox_runtime_error", __FILE__)
 
 class Rlox
   class HadError
+    include Singleton
+
+    attr_accessor :value
+
+    def initialize
+      @value = false
+    end
+  end
+
+  class HadRuntimeError
     include Singleton
 
     attr_accessor :value
@@ -35,6 +46,7 @@ class Rlox
 
     # Error in code
     exit(65) if HadError.instance.value
+    exit(70) if HadRuntimeError.instance.value
   end
 
   def self.run_prompt
@@ -42,6 +54,7 @@ class Rlox
       buffer = Readline.readline("> ", true)
       run(buffer)
       HadError.instance.value = false
+      HadRuntimeError.instance.value = false  # not needed to check during .run, but hey why not?
     end
   end
 
@@ -59,6 +72,12 @@ class Rlox
       where = ""
     end
     report(line, where, message)
+    HadError.instance.value = true
+  end
+
+  def self.runtime_error(error)
+    self.report(error.token.line,"", error.message)
+    HadRuntimeError.instance.value = true
   end
 
   private_class_method def self.run(code)
@@ -71,11 +90,10 @@ class Rlox
 
     puts "AST: #{AstPrinter.new.print(expression)}"
 
-    puts Interpreter.new.evaluate(expression)
+    Interpreter.new.interpret(expression)
   end
 
   private_class_method def self.report(line, where, message)
     puts "[line #{line}] Error#{where}: #{message}"
-    HadError.instance.value = true
   end
 end

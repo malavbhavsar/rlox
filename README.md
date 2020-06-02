@@ -10,4 +10,6 @@ in Ruby 💎.
 
 ✅ Read and Implement [V1 of Parsing and AST generation](https://craftinginterpreters.com/parsing-expressions.html)
 
-🤓 Read and Implement [V1 of Evaluating Expression](https://craftinginterpreters.com/evaluating-expressions.html)
+✅ Read and Implement [V1 of Evaluating Expression](https://craftinginterpreters.com/evaluating-expressions.html)
+
+🤓 Read and Implement [V1 of Statements and State](https://craftinginterpreters.com/statements-and-state.html)

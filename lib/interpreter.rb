@@ -4,11 +4,19 @@ class Interpreter < Visitor
   def initialize
   end
 
+  def interpret(expression)
+    value = evaluate expression
+    puts value
+  rescue RloxRuntimeError => error
+    Rlox.runtime_error(error)
+  end
+
   def evaluate(expression)
     expression.accept(self)
   end
 
   def visit_binary_expr(expr)
+    operator = expr.operator
     left = evaluate(expr.left)
     right = evaluate(expr.right)
 
@@ -25,25 +33,33 @@ class Interpreter < Visitor
     # rebuilding that in ruby? Or should I just follow what Object#== does? What is difference between Java equality and
     # Object#== ? These are hard questions to answer for a newcomer. For now, sticking to Object#==.
 
-    case expr.operator.type
+    case operator.type
     when Token::TYPE[:GREATER]
+      check_number_operands(operator, left, right)
       return left > right
     when Token::TYPE[:GREATER_EQUAL]
+      check_number_operands(operator, left, right)
       return left >= right
     when Token::TYPE[:LESS]
+      check_number_operands(operator, left, right)
       return left < right
     when Token::TYPE[:LESS_EQUAL]
+      check_number_operands(operator, left, right)
       return left <= right
     when Token::TYPE[:MINUS]
+      check_number_operands(operator, left, right)
       return left - right
     when Token::TYPE[:PLUS]
       if ((left.is_a?(Integer) || left.is_a?(Float)) && (right.is_a?(Integer) || right.is_a?(Float))) ||
         (left.is_a?(String) && right.is_a?(String))
         return left + right
       end
+      raise RloxRuntimeError.new(operator, "Operands must be numbers.")
     when Token::TYPE[:SLASH]
+      check_number_operands(operator, left, right)
       return left / right
     when Token::TYPE[:STAR]
+      check_number_operands(operator, left, right)
       return left * right
     when Token::TYPE[:BANG_EQUAL]
       return left != right
@@ -53,7 +69,7 @@ class Interpreter < Visitor
   end
 
   def visit_grouping_expr(expr)
-    evaluate(expr)
+    evaluate(expr.expression)
   end
 
   def visit_literal_expr(expr)
@@ -61,10 +77,11 @@ class Interpreter < Visitor
   end
 
   def visit_unary_expr(expr)
-    right = expr.right
+    right = evaluate(expr.right)
 
     case expr.operator.type
     when Token::TYPE[:MINUS]
+      check_number_operands(expr.operator, right)
       return -right.to_f
     when Token::TYPE[:BANG]
       return !is_truthy?(right)
@@ -75,21 +92,12 @@ class Interpreter < Visitor
 
   private
 
-  def is_truthy?(expr)
-    !!expr.value # Lox follows Ruby's rule for truthiness
+  def check_number_operands(operator, *operands)
+    return if operands.all? { |operand| operand.is_a?(Integer) || operand.is_a?(Float) }
+    raise RloxRuntimeError.new(operator, "Operands must be numbers.")
   end
 
-  def parenthesize(name, *exprs)
-    output = String.new
-
-    output << '('
-    output << name
-    exprs.each do |expr|
-      output << ' '
-      output << expr.accept(self)
-    end
-    output << ')'
-
-    output
+  def is_truthy?(expr)
+    !!expr.value # Lox follows Ruby's rule for truthiness
   end
 end
