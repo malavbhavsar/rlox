@@ -4,7 +4,10 @@ class Interpreter
   include Expr::Visitor
   include Stmt::Visitor
 
+  attr_reader :environment
+
   def initialize
+    @environment = Environment.new
   end
 
   def interpret(statements)
@@ -25,6 +28,11 @@ class Interpreter
 
   def visit_expression_stmt(stmt)
     evaluate(stmt.expression)
+  end
+
+  def visit_var_stmt(stmt)
+    value = stmt.initializer ? evaluate(stmt.initializer) : nil
+    environment.define(stmt.name.lexeme, value)
   end
 
   def visit_print_stmt(stmt)
@@ -105,6 +113,10 @@ class Interpreter
     end
 
     nil
+  end
+
+  def visit_variable_expr(expr)
+    environment.get(expr.name)
   end
 
   private

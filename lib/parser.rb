@@ -13,11 +13,9 @@ class Parser
   def parse
     statements = []
     while !is_at_end?
-      statements << statement
+      statements << declaration
     end
     statements
-  rescue ParseError => e
-    nil
   end
 
   private
@@ -26,12 +24,28 @@ class Parser
   # Recursive Descent hierarchy
   ####################################
 
+  def declaration
+    return var_declaration if match(Token::TYPE[:VAR])
+
+    statement
+  rescue ParseError => error
+    # synchronize # TODO: implement synchronize method
+    nil
+  end
+
+  def var_declaration
+    name = consume(Token::TYPE[:IDENTIFIER], "Expect variable name.")
+    initializer = match(Token::TYPE[:EQUAL]) ? expression : nil
+
+    consume(Token::TYPE[:SEMICOLON], "Expect ';' after variable declaration.")
+
+    Stmt::Var.new(name, initializer)
+  end
+
   def statement
-    if match(Token::TYPE[:PRINT])
-      print_statement
-    else
-      expression_statement
-    end
+    return print_statement if match(Token::TYPE[:PRINT])
+
+    expression_statement
   end
 
   def print_statement
@@ -113,6 +127,7 @@ class Parser
     return Expr::Literal.new(true) if match(Token::TYPE[:TRUE])
     return Expr::Literal.new(nil) if match(Token::TYPE[:NIL])
     return Expr::Literal.new(previous.literal) if match(Token::TYPE[:NUMBER], Token::TYPE[:STRING])
+    return Expr::Variable.new(previous) if match(Token::TYPE[:IDENTIFIER])
 
     if match(Token::TYPE[:LEFT_PAREN])
       expr = expression

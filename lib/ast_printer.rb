@@ -4,9 +4,6 @@ class AstPrinter
   include Expr::Visitor
   # include Stmt::Visitor TODO: support printing AST of full program
 
-  def initialize
-  end
-
   def print(expression)
     expression.accept(self)
   end

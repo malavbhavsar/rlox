@@ -9,7 +9,7 @@ module Expr
         attr_reader #{v.map { |vv| ":#{vv[:name]}" }.join(', ')}
 
         def initialize(#{v.map { |vv| "#{vv[:name]}" }.join(', ')})
-          #{v.map { |vv| "raise \"#{vv[:name]} must be of type #{Util.grammar_to_internal_type(vv[:type])}\" unless #{vv[:name]}.is_a?(#{Util.grammar_to_internal_type(vv[:type])})" }.join("\n") }
+          #{v.map { |vv| "raise \"#{vv[:name]} must be of type #{Util.grammar_to_internal_type(vv[:type])}\" unless #{vv[:name]}.nil? || #{vv[:name]}.is_a?(#{Util.grammar_to_internal_type(vv[:type])})" }.join("\n") }
 
           #{v.map { |vv| "@#{vv[:name]} = #{vv[:name]}" }.join("\n") }
         end

@@ -6,6 +6,10 @@ module Stmt
       raise NotImplementedError
     end
 
+    def visit_var_stmt(_stmt)
+      raise NotImplementedError
+    end
+
     def visit_print_stmt(_stmt)
       raise NotImplementedError
     end

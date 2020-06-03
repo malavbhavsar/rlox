@@ -17,5 +17,9 @@ module Expr
     def visit_unary_expr(_expr)
       raise NotImplementedError
     end
+
+    def visit_variable_expr(_expr)
+      raise NotImplementedError
+    end
   end
 end

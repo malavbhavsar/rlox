@@ -1,0 +1,6 @@
+var b = 4 * 3;
+print b;
+var c = b / 2;
+print c;
+var d = "World";
+print "Hello, " + d + "!"; 
