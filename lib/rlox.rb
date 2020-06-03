@@ -7,10 +7,12 @@ require 'byebug'
 require File.expand_path("../internals/util", __FILE__)
 require File.expand_path("../scanner", __FILE__)
 require File.expand_path("../token", __FILE__)
-require File.expand_path("../grammer", __FILE__)
+require File.expand_path("../grammar", __FILE__)
 require File.expand_path("../expr", __FILE__)
+require File.expand_path("../stmt", __FILE__)
 require File.expand_path("../parser", __FILE__)
-require File.expand_path("../visitor", __FILE__)
+require File.expand_path("../expr/visitor", __FILE__)
+require File.expand_path("../stmt/visitor", __FILE__)
 require File.expand_path("../ast_printer", __FILE__)
 require File.expand_path("../interpreter", __FILE__)
 require File.expand_path("../rlox_runtime_error", __FILE__)
@@ -84,13 +86,13 @@ class Rlox
     scanner = Scanner.new(code)
     tokens = scanner.scan_tokens
     parser = Parser.new(tokens)
-    expression = parser.parse
+    statements = parser.parse
 
     return if HadError.instance.value
 
-    puts "AST: #{AstPrinter.new.print(expression)}"
+    # puts "AST: #{AstPrinter.new.print(expression)}" TODO: support printing AST of full program
 
-    Interpreter.new.interpret(expression)
+    Interpreter.new.interpret(statements)
   end
 
   private_class_method def self.report(line, where, message)

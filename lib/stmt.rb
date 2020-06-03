@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-module Expr
+module Stmt
   class Base; end;
 
-  Grammar::EXPR.each do |k, v|
+  Grammar::STMT.each do |k, v|
     self.class_eval <<-EVAL
       class #{k} < Base
         attr_reader #{v.map { |vv| ":#{vv[:name]}" }.join(', ')}
@@ -16,7 +16,7 @@ module Expr
 
         def accept(visitor)
           raise "visitor is not of type Visitor" unless visitor.is_a?(Visitor)
-          visitor.visit_#{Util.underscore k}_expr(self)
+          visitor.visit_#{Util.underscore k}_stmt(self)
         end
       end
     EVAL

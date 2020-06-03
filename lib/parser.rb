@@ -11,7 +11,11 @@ class Parser
   end
 
   def parse
-    expression
+    statements = []
+    while !is_at_end?
+      statements << statement
+    end
+    statements
   rescue ParseError => e
     nil
   end
@@ -21,6 +25,26 @@ class Parser
   ####################################
   # Recursive Descent hierarchy
   ####################################
+
+  def statement
+    if match(Token::TYPE[:PRINT])
+      print_statement
+    else
+      expression_statement
+    end
+  end
+
+  def print_statement
+    value = expression
+    consume(Token::TYPE[:SEMICOLON], "Expect ';' after value.")
+    Stmt::Print.new(value)
+  end
+
+  def expression_statement
+    expr = expression
+    consume(Token::TYPE[:SEMICOLON], "Expect ';' after expression.")
+    Stmt::Expression.new(expr)
+  end
 
   def expression
     equality

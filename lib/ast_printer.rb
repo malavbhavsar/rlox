@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
-class AstPrinter < Visitor
+class AstPrinter
+  include Expr::Visitor
+  # include Stmt::Visitor TODO: support printing AST of full program
+
   def initialize
   end
 

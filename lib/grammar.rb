@@ -7,4 +7,9 @@ module Grammar
     "Literal"  => [{ type: "Object", name: "value" }],
     "Unary"    => [{ type: "Token", name: "operator" }, { type: "Expr", name: "right" }],
   }.freeze
+
+  STMT = {
+    "Expression" => [{ type: "Expr", name: "expression" }],
+    "Print"      => [{ type: "Expr", name: "expression" }],
+  }
 end

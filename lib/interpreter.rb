@@ -1,18 +1,35 @@
 # frozen_string_literal: true
 
-class Interpreter < Visitor
+class Interpreter
+  include Expr::Visitor
+  include Stmt::Visitor
+
   def initialize
   end
 
-  def interpret(expression)
-    value = evaluate expression
-    puts value
+  def interpret(statements)
+    statements.each do |statement|
+      execute(statement)
+    end
   rescue RloxRuntimeError => error
     Rlox.runtime_error(error)
   end
 
-  def evaluate(expression)
-    expression.accept(self)
+  def execute(stmt)
+    stmt.accept(self)
+  end
+
+  def evaluate(expr)
+    expr.accept(self)
+  end
+
+  def visit_expression_stmt(stmt)
+    evaluate(stmt.expression)
+  end
+
+  def visit_print_stmt(stmt)
+    value = evaluate(stmt.expression)
+    puts value
   end
 
   def visit_binary_expr(expr)
