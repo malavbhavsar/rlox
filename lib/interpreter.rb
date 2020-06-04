@@ -40,6 +40,13 @@ class Interpreter
     puts value
   end
 
+  def visit_assign_expr(expr)
+    value = evaluate(expr.value)
+
+    environment.assign(expr.name, value)
+    value
+  end
+
   def visit_binary_expr(expr)
     operator = expr.operator
     left = evaluate(expr.left)

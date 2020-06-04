@@ -7,6 +7,15 @@ class Environment
     @values = {}
   end
 
+  def assign(token, value)
+    if values.has_key?(token.lexeme)
+      values[token.lexeme] = value
+      return value
+    end
+
+    raise RloxRuntimeError.new(token, "Undefined variable #{token.lexeme}.")
+  end
+
   def define(name, value)
     values[name] = value
   end

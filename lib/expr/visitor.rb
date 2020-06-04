@@ -2,6 +2,10 @@
 
 module Expr
   module Visitor
+    def visit_assign_expr(_expr)
+      raise NotImplementedError
+    end
+
     def visit_binary_expr(_expr)
       raise NotImplementedError
     end
