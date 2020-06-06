@@ -12,9 +12,4 @@ module Util
     word.downcase!
     word
   end
-
-  def grammar_to_internal_type(type)
-    type += "::Base" if ['Stmt', 'Expr'].include? type
-    type
-  end
 end

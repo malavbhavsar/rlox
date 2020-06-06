@@ -11,6 +11,7 @@ module Grammar
   }.freeze
 
   STMT = {
+    "Block"      => [{ type: "Stmt", name: "statements", zero_or_more: true }],
     "Expression" => [{ type: "Expr", name: "expression" }],
     "Print"      => [{ type: "Expr", name: "expression" }],
     "Var"        => [{ type: "Token", name: "name" }, { type: "Expr", name: "initializer" }]

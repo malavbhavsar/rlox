@@ -4,7 +4,7 @@ class Interpreter
   include Expr::Visitor
   include Stmt::Visitor
 
-  attr_reader :environment
+  attr_accessor :environment
 
   def initialize
     @environment = Environment.new
@@ -26,18 +26,32 @@ class Interpreter
     expr.accept(self)
   end
 
-  def visit_expression_stmt(stmt)
-    evaluate(stmt.expression)
+  def execute_block(statements)
+    previous = environment
+
+    self.environment = Environment.new(previous)
+    statements.each { |statement| execute(statement) }
+  ensure
+    self.environment = previous
   end
 
-  def visit_var_stmt(stmt)
-    value = stmt.initializer ? evaluate(stmt.initializer) : nil
-    environment.define(stmt.name.lexeme, value)
+  def visit_block_stmt(stmt)
+    execute_block(stmt.statements)
+    nil
+  end
+
+  def visit_expression_stmt(stmt)
+    evaluate(stmt.expression)
   end
 
   def visit_print_stmt(stmt)
     value = evaluate(stmt.expression)
     puts value
+  end
+
+  def visit_var_stmt(stmt)
+    value = stmt.initializer ? evaluate(stmt.initializer) : nil
+    environment.define(stmt.name.lexeme, value)
   end
 
   def visit_assign_expr(expr)
