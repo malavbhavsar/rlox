@@ -44,6 +44,14 @@ class Interpreter
     evaluate(stmt.expression)
   end
 
+  def visit_if_stmt(stmt)
+    if is_truthy?(evaluate(stmt.condition))
+      execute(stmt.then_branch)
+    elsif stmt.else_branch
+      execute(stmt.else_branch)
+    end
+  end
+
   def visit_print_stmt(stmt)
     value = evaluate(stmt.expression)
     puts value
@@ -147,7 +155,7 @@ class Interpreter
     raise RloxRuntimeError.new(operator, "Operands must be numbers.")
   end
 
-  def is_truthy?(expr)
-    !!expr.value # Lox follows Ruby's rule for truthiness
+  def is_truthy?(val)
+    !!val # Lox follows Ruby's rule for truthiness
   end
 end

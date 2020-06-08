@@ -1,0 +1,14 @@
+var a = 3;
+if(a > 4) {
+  print "a is greater than 4";
+  print a;
+} else {
+  print "a is less than 4";
+  print a;
+}
+
+if (!((3 + 3) == 6)) {
+  print "then";
+} else {
+  print "else";
+}

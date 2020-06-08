@@ -13,6 +13,7 @@ module Grammar
   STMT = {
     "Block"      => [{ type: "Stmt", name: "statements", zero_or_more: true }],
     "Expression" => [{ type: "Expr", name: "expression" }],
+    "If"         => [{ type: "Expr", name: "condition" }, { type: "Stmt", name: "then_branch" }, { type: "Stmt", name: "else_branch" }],
     "Print"      => [{ type: "Expr", name: "expression" }],
     "Var"        => [{ type: "Token", name: "name" }, { type: "Expr", name: "initializer" }]
   }
