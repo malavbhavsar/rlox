@@ -2,6 +2,14 @@
 
 module AstGenerationHelper
   class << self
+    def visitor_module_eval_string(rule_type, rule_head)
+      <<-EVAL
+        def visit_#{Util.underscore rule_head}_#{Util.underscore rule_type}(_#{Util.underscore rule_type})
+          raise NotImplementedError
+        end
+      EVAL
+    end
+
     def class_eval_string(rule_type, rule_head, rule_body)
       <<-EVAL
         class #{rule_head} < Base
@@ -53,6 +61,12 @@ module AstGenerationHelper
 end
 
 module Expr
+  module Visitor
+    Grammar::EXPR.each do |rule_head, _rule_body|
+      self.module_eval AstGenerationHelper.visitor_module_eval_string('Expr', rule_head)
+    end
+  end
+
   class Base; end;
 
   Grammar::EXPR.each do |rule_head, rule_body|
@@ -61,6 +75,12 @@ module Expr
 end
 
 module Stmt
+  module Visitor
+    Grammar::STMT.each do |rule_head, _rule_body|
+      self.module_eval AstGenerationHelper.visitor_module_eval_string('Stmt', rule_head)
+    end
+  end
+
   class Base; end;
 
   Grammar::STMT.each do |rule_head, rule_body|
