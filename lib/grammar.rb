@@ -17,5 +17,6 @@ module Grammar
     "If"         => [{ type: "Expr", name: "condition" }, { type: "Stmt", name: "then_branch" }, { type: "Stmt", name: "else_branch" }],
     "Print"      => [{ type: "Expr", name: "expression" }],
     "Var"        => [{ type: "Token", name: "name" }, { type: "Expr", name: "initializer" }],
+    "While"        => [{ type: "Expr", name: "condition" }, { type: "Stmt", name: "body" }],
   }
 end

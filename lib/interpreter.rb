@@ -62,6 +62,13 @@ class Interpreter
     environment.define(stmt.name.lexeme, value)
   end
 
+  def visit_while_stmt(stmt)
+    while is_truthy?(evaluate(stmt.condition))
+      execute(stmt.body)
+    end
+    nil
+  end
+
   def visit_assign_expr(expr)
     value = evaluate(expr.value)
 

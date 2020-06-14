@@ -43,17 +43,37 @@ class Parser
   end
 
   def statement
-    return print_statement if match(Token::TYPE[:PRINT])
-    return block_statement if match(Token::TYPE[:LEFT_BRACE])
     return if_statement if match(Token::TYPE[:IF])
+    return print_statement if match(Token::TYPE[:PRINT])
+    return while_statement if match(Token::TYPE[:WHILE])
+    return block_statement if match(Token::TYPE[:LEFT_BRACE])
 
     expression_statement
+  end
+
+  def if_statement
+    consume(Token::TYPE[:LEFT_PAREN], "Expect '(' after if.")
+    condition = expression
+    consume(Token::TYPE[:RIGHT_PAREN], "Expect ')' after if condition.")
+    then_branch = statement
+    else_branch = statement if match(Token::TYPE[:ELSE])
+
+    Stmt::If.new(condition, then_branch, else_branch)
   end
 
   def print_statement
     value = expression
     consume(Token::TYPE[:SEMICOLON], "Expect ';' after value.")
     Stmt::Print.new(value)
+  end
+
+  def while_statement
+    consume(Token::TYPE[:LEFT_PAREN], "Expect '(' after 'while'.")
+    condition = expression
+    consume(Token::TYPE[:RIGHT_PAREN], "Expect ')' after condition.")
+    body = statement
+
+    Stmt::While.new(condition, body)
   end
 
   def block_statement
@@ -66,16 +86,6 @@ class Parser
     consume(Token::TYPE[:RIGHT_BRACE], "Expect '}' after block.")
 
     Stmt::Block.new(statements)
-  end
-
-  def if_statement
-    consume(Token::TYPE[:LEFT_PAREN], "Expect '(' after if.")
-    condition = expression
-    consume(Token::TYPE[:RIGHT_PAREN], "Expect ')' after if condition.")
-    then_branch = statement
-    else_branch = statement if match(Token::TYPE[:ELSE])
-
-    Stmt::If.new(condition, then_branch, else_branch)
   end
 
   def expression_statement
