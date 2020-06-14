@@ -43,12 +43,42 @@ class Parser
   end
 
   def statement
+    return for_statement if match(Token::TYPE[:FOR])
     return if_statement if match(Token::TYPE[:IF])
     return print_statement if match(Token::TYPE[:PRINT])
     return while_statement if match(Token::TYPE[:WHILE])
     return block_statement if match(Token::TYPE[:LEFT_BRACE])
 
     expression_statement
+  end
+
+  def for_statement
+    consume(Token::TYPE[:LEFT_PAREN], "Expect '(' after for.")
+
+    initializer = if match(Token::TYPE[:SEMICOLON])
+      nil
+    elsif match(Token::TYPE[:VAR])
+      var_declaration
+    else
+      expression_statement
+    end
+
+    condition = expression unless check(Token::TYPE[:SEMICOLON])
+    consume(Token::TYPE[:SEMICOLON], "Expect ';' after loop condition.")
+
+    increment = expression unless check(Token::TYPE[:RIGHT_PAREN])
+    consume(Token::TYPE[:RIGHT_PAREN], "Expect ')' after for clauses.")
+
+    body = statement
+
+    body = Stmt::Block.new([body, Stmt::Expression.new(increment)]) unless increment.nil?
+
+    condition = Expr::Literal.new(true) if condition.nil?
+    body = Stmt::While.new(condition, body)
+
+    body = Stmt::Block.new([initializer, body]) unless initializer.nil?
+
+    body
   end
 
   def if_statement

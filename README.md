@@ -4,14 +4,16 @@ Tree-walk interpreter of Lox programming language from [craftinginterpreters.com
 in Ruby 💎.
 
 ## Roadmap 🛣
-✅ Read and Implement [Scanner](https://craftinginterpreters.com/scanning.html)
+✅ [Scanning](https://craftinginterpreters.com/scanning.html)
 
-✅ Read and Implement [V0 of AST printing](https://craftinginterpreters.com/representing-code.html)
+✅ [Representing Code](https://craftinginterpreters.com/representing-code.html)
 
-✅ Read and Implement [Basic Parsing and AST generation](https://craftinginterpreters.com/parsing-expressions.html)
+✅ [Parsing Expressions](https://craftinginterpreters.com/parsing-expressions.html)
 
-✅ Read and Implement [Evaluating Expression](https://craftinginterpreters.com/evaluating-expressions.html)
+✅ [Evaluating Expressions](https://craftinginterpreters.com/evaluating-expressions.html)
 
-✅ Read and Implement [Statements and State](https://craftinginterpreters.com/statements-and-state.html)
+✅ [Statements and State](https://craftinginterpreters.com/statements-and-state.html)
 
-🤓 Read and Implement [Control Flow](https://craftinginterpreters.com/control-flow.html)
+✅ [Control Flow](https://craftinginterpreters.com/control-flow.html)
+
+🤓 [Functions](https://craftinginterpreters.com/functions.html)
