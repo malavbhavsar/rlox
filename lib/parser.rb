@@ -89,7 +89,7 @@ class Parser
   end
 
   def assignment
-    expr = equality
+    expr = lox_or
 
     if match(Token::TYPE[:EQUAL])
       operator = previous
@@ -112,6 +112,32 @@ class Parser
       operator = previous
       right = comparision
       expr = Expr::Binary.new(expr, operator, right)
+    end
+
+    expr
+  end
+
+  def lox_or
+    expr = lox_and
+
+    while match(Token::TYPE[:OR])
+      operator = previous
+      right = lox_and
+
+      expr = Expr::Logical.new(expr, operator, right)
+    end
+
+    expr
+  end
+
+  def lox_and
+    expr = equality
+
+    while match(Token::TYPE[:AND])
+      operator = previous
+      right = equality
+
+      expr = Expr::Logical(expr, operator, right)
     end
 
     expr

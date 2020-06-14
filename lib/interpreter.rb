@@ -130,6 +130,17 @@ class Interpreter
     expr.value
   end
 
+  def visit_logical_expr(expr)
+    left = evaluate(expr.left)
+    if expr.operator.type == Token::TYPE[:OR]
+      return left if is_truthy?(left)
+    else
+      return left unless is_truthy?(left)
+    end
+
+    evaluate(expr.right)
+  end
+
   def visit_unary_expr(expr)
     right = evaluate(expr.right)
 
