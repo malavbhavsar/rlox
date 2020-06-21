@@ -14,8 +14,8 @@ class Interpreter
     statements.each do |statement|
       execute(statement)
     end
-  rescue RloxRuntimeError => error
-    Rlox.runtime_error(error)
+  rescue RloxRuntimeError => e
+    Rlox.runtime_error(e)
   end
 
   def execute(stmt)
@@ -45,7 +45,7 @@ class Interpreter
   end
 
   def visit_if_stmt(stmt)
-    if is_truthy?(evaluate(stmt.condition))
+    if truthy?(evaluate(stmt.condition))
       execute(stmt.then_branch)
     elsif stmt.else_branch
       execute(stmt.else_branch)
@@ -63,9 +63,7 @@ class Interpreter
   end
 
   def visit_while_stmt(stmt)
-    while is_truthy?(evaluate(stmt.condition))
-      execute(stmt.body)
-    end
+    execute(stmt.body) while truthy?(evaluate(stmt.condition))
     nil
   end
 
@@ -97,35 +95,36 @@ class Interpreter
     case operator.type
     when Token::TYPE[:GREATER]
       check_number_operands(operator, left, right)
-      return left > right
+      left > right
     when Token::TYPE[:GREATER_EQUAL]
       check_number_operands(operator, left, right)
-      return left >= right
+      left >= right
     when Token::TYPE[:LESS]
       check_number_operands(operator, left, right)
-      return left < right
+      left < right
     when Token::TYPE[:LESS_EQUAL]
       check_number_operands(operator, left, right)
-      return left <= right
+      left <= right
     when Token::TYPE[:MINUS]
       check_number_operands(operator, left, right)
-      return left - right
+      left - right
     when Token::TYPE[:PLUS]
       if ((left.is_a?(Integer) || left.is_a?(Float)) && (right.is_a?(Integer) || right.is_a?(Float))) ||
-        (left.is_a?(String) && right.is_a?(String))
+         (left.is_a?(String) && right.is_a?(String))
         return left + right
       end
+
       raise RloxRuntimeError.new(operator, "Operands must be numbers.")
     when Token::TYPE[:SLASH]
       check_number_operands(operator, left, right)
-      return left / right
+      left / right
     when Token::TYPE[:STAR]
       check_number_operands(operator, left, right)
-      return left * right
+      left * right
     when Token::TYPE[:BANG_EQUAL]
-      return left != right
+      left != right
     when Token::TYPE[:EQUAL_EQUAL]
-      return left == right
+      left == right
     end
   end
 
@@ -140,9 +139,9 @@ class Interpreter
   def visit_logical_expr(expr)
     left = evaluate(expr.left)
     if expr.operator.type == Token::TYPE[:OR]
-      return left if is_truthy?(left)
+      return left if truthy?(left)
     else
-      return left unless is_truthy?(left)
+      return left unless truthy?(left)
     end
 
     evaluate(expr.right)
@@ -156,7 +155,7 @@ class Interpreter
       check_number_operands(expr.operator, right)
       return -right.to_f
     when Token::TYPE[:BANG]
-      return !is_truthy?(right)
+      return !truthy?(right)
     end
 
     nil
@@ -170,10 +169,11 @@ class Interpreter
 
   def check_number_operands(operator, *operands)
     return if operands.all? { |operand| operand.is_a?(Integer) || operand.is_a?(Float) }
+
     raise RloxRuntimeError.new(operator, "Operands must be numbers.")
   end
 
-  def is_truthy?(val)
+  def truthy?(val)
     !!val # Lox follows Ruby's rule for truthiness
   end
 end

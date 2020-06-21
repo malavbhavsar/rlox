@@ -3,7 +3,7 @@
 
 # Usage: rlox [FILE]
 
-require File.expand_path("../../lib/rlox", __FILE__)
+require File.expand_path("../lib/rlox", __dir__)
 
 case ARGV.count
 when 0

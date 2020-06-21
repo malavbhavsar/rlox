@@ -15,10 +15,10 @@ module AstGenerationHelper
         class #{rule_head} < Base
           attr_reader #{rule_body.map { |body_part| ":#{body_part[:name]}" }.join(', ')}
 
-          def initialize(#{rule_body.map { |body_part| "#{body_part[:name]}" }.join(', ')})
-            #{rule_body.map { |body_part| body_part_type_check(body_part) }.join("\n") }
+          def initialize(#{rule_body.map { |body_part| (body_part[:name]).to_s }.join(', ')})
+            #{rule_body.map { |body_part| body_part_type_check(body_part) }.join("\n")}
 
-            #{rule_body.map { |body_part| "@#{body_part[:name]} = #{body_part[:name]}" }.join("\n") }
+            #{rule_body.map { |body_part| "@#{body_part[:name]} = #{body_part[:name]}" }.join("\n")}
           end
 
           def accept(visitor)
@@ -53,37 +53,36 @@ module AstGenerationHelper
 
     def grammar_type(body_part)
       type = body_part[:type]
-      type += "::Base" if ['Stmt', 'Expr'].include? type
+      type += "::Base" if %w[Stmt Expr].include? type
       type
     end
-
   end
 end
 
 module Expr
   module Visitor
     Grammar::EXPR.each do |rule_head, _rule_body|
-      self.module_eval AstGenerationHelper.visitor_module_eval_string('Expr', rule_head)
+      module_eval AstGenerationHelper.visitor_module_eval_string("Expr", rule_head)
     end
   end
 
-  class Base; end;
+  class Base; end
 
   Grammar::EXPR.each do |rule_head, rule_body|
-    self.class_eval AstGenerationHelper.class_eval_string('Expr', rule_head, rule_body)
+    class_eval AstGenerationHelper.class_eval_string("Expr", rule_head, rule_body)
   end
 end
 
 module Stmt
   module Visitor
     Grammar::STMT.each do |rule_head, _rule_body|
-      self.module_eval AstGenerationHelper.visitor_module_eval_string('Stmt', rule_head)
+      module_eval AstGenerationHelper.visitor_module_eval_string("Stmt", rule_head)
     end
   end
 
-  class Base; end;
+  class Base; end
 
   Grammar::STMT.each do |rule_head, rule_body|
-    self.class_eval AstGenerationHelper.class_eval_string('Stmt', rule_head, rule_body)
+    class_eval AstGenerationHelper.class_eval_string("Stmt", rule_head, rule_body)
   end
 end

@@ -9,7 +9,7 @@ class Environment
   end
 
   def assign(token, value)
-    if values.has_key?(token.lexeme)
+    if values.key?(token.lexeme)
       values[token.lexeme] = value
       return value
     end
@@ -27,7 +27,7 @@ class Environment
   end
 
   def get(token)
-    return values[token.lexeme] if values.has_key?(token.lexeme)
+    return values[token.lexeme] if values.key?(token.lexeme)
 
     return enclosing.get(token) unless enclosing.nil?
 

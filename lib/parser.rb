@@ -12,9 +12,7 @@ class Parser
 
   def parse
     statements = []
-    while !is_at_end?
-      statements << declaration
-    end
+    statements << declaration until at_end?
     statements
   end
 
@@ -28,7 +26,8 @@ class Parser
     return var_declaration if match(Token::TYPE[:VAR])
 
     statement
-  rescue ParseError => error
+  rescue ParseError => e
+    puts "error happened #{e}. TODO: implement synchronize"
     # synchronize # TODO: implement synchronize method
     nil
   end
@@ -56,11 +55,11 @@ class Parser
     consume(Token::TYPE[:LEFT_PAREN], "Expect '(' after for.")
 
     initializer = if match(Token::TYPE[:SEMICOLON])
-      nil
-    elsif match(Token::TYPE[:VAR])
-      var_declaration
-    else
-      expression_statement
+                    nil
+                  elsif match(Token::TYPE[:VAR])
+                    var_declaration
+                  else
+                    expression_statement
     end
 
     condition = expression unless check(Token::TYPE[:SEMICOLON])
@@ -109,9 +108,7 @@ class Parser
   def block_statement
     statements = []
 
-    while !check(Token::TYPE[:RIGHT_BRACE]) && !is_at_end?
-      statements.push(declaration)
-    end
+    statements.push(declaration) while !check(Token::TYPE[:RIGHT_BRACE]) && !at_end?
 
     consume(Token::TYPE[:RIGHT_BRACE], "Expect '}' after block.")
 
@@ -135,9 +132,7 @@ class Parser
       operator = previous
       right = assignment
 
-      if expr.is_a?(Expr::Variable)
-        return Expr::Assign.new(expr.name, right)
-      end
+      return Expr::Assign.new(expr.name, right) if expr.is_a?(Expr::Variable)
 
       error(operator, "Invalid assignment target.")
     end
@@ -238,7 +233,7 @@ class Parser
 
     if match(Token::TYPE[:LEFT_PAREN])
       expr = expression
-      consume(Token::TYPE[:RIGHT_PAREN], "Expect ')' after expression.");
+      consume(Token::TYPE[:RIGHT_PAREN], "Expect ')' after expression.")
       return Expr::Grouping.new(expr)
     end
 
@@ -258,16 +253,17 @@ class Parser
   end
 
   def check(*types)
-    return false if is_at_end?
-    return types.include?(peek.type)
+    return false if at_end?
+
+    types.include?(peek.type)
   end
 
   def advance
-    @current += 1 unless is_at_end?
+    @current += 1 unless at_end?
     previous
   end
 
-  def is_at_end?
+  def at_end?
     peek.type == Token::TYPE[:EOF]
   end
 

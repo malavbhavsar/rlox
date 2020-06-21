@@ -3,6 +3,9 @@
 Tree-walk interpreter of Lox programming language from [craftinginterpreters.com](craftinginterpreters.com) implemented
 in Ruby 💎.
 
+## Code status
+![Lint](https://github.com/malavbhavsar/rlox/workflows/Lint/badge.svg) ![Test](https://github.com/malavbhavsar/rlox/workflows/Test/badge.svg)
+
 ## Roadmap 🛣
 ✅ [Scanning](https://craftinginterpreters.com/scanning.html)
 

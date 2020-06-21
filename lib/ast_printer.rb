@@ -17,7 +17,8 @@ class AstPrinter
   end
 
   def visit_literal_expr(expr)
-    return "nil" if expr.value == nil
+    return "nil" if expr.value.nil?
+
     expr.value.to_s
   end
 
@@ -26,16 +27,17 @@ class AstPrinter
   end
 
   private
-  def parenthesize(name, *exprs)
-    output = String.new
 
-    output << '('
+  def parenthesize(name, *exprs)
+    output = +""
+
+    output << "("
     output << name
     exprs.each do |expr|
-      output << ' '
+      output << " "
       output << expr.accept(self)
     end
-    output << ')'
+    output << ")"
 
     output
   end

@@ -2,7 +2,7 @@
 
 class Scanner
   DIGITS = (0..9).map(&:to_s)
-  ALPHAS = ('a'..'z').to_a + ('A'..'Z').to_a + ['_']
+  ALPHAS = ("a".."z").to_a + ("A".."Z").to_a + ["_"]
 
   attr_accessor :source, :tokens, :start, :current, :line
 
@@ -15,7 +15,7 @@ class Scanner
   end
 
   def scan_tokens
-    while !is_at_end?
+    until at_end?
       self.start = current
       scan_token
     end
@@ -27,65 +27,62 @@ class Scanner
 
   private
 
-  def is_at_end?(offset = 0)
+  def at_end?(offset = 0)
     (current + offset) >= source.length
   end
 
   def peek(offset = 0)
-    return '\0' if is_at_end?(offset)
+    return '\0' if at_end?(offset)
+
     source[current + offset]
   end
 
   def advance
     self.current += 1
-    source[current-1]
+    source[current - 1]
   end
 
   def scan_token
     char = advance
 
     case char
-    when '('
+    when "("
       add_token(Token::TYPE[:LEFT_PAREN])
-    when ')'
+    when ")"
       add_token(Token::TYPE[:RIGHT_PAREN])
-    when '{'
+    when "{"
       add_token(Token::TYPE[:LEFT_BRACE])
-    when '}'
+    when "}"
       add_token(Token::TYPE[:RIGHT_BRACE])
-    when ','
+    when ","
       add_token(Token::TYPE[:COMMA])
-    when '.'
+    when "."
       add_token(Token::TYPE[:DOT])
-    when '-'
+    when "-"
       add_token(Token::TYPE[:MINUS])
-    when '+'
+    when "+"
       add_token(Token::TYPE[:PLUS])
-    when ';'
+    when ";"
       add_token(Token::TYPE[:SEMICOLON])
-    when '*'
+    when "*"
       add_token(Token::TYPE[:STAR])
-    when '#' # I like Ruby style comments
-      while peek != "\n" && !is_at_end? # Note: "\n" != '\n'
-        advance
-      end
-    when '!'
-      add_token(second_char_match?('=') ? Token::TYPE[:BANG_EQUAL] : Token::TYPE[:BANG])
-    when '='
-      add_token(second_char_match?('=') ? Token::TYPE[:EQUAL_EQUAL] : Token::TYPE[:EQUAL])
-    when '<'
-      add_token(second_char_match?('=') ? Token::TYPE[:LESS_EQUAL] : Token::TYPE[:LESS])
-    when '>'
-      add_token(second_char_match?('=') ? Token::TYPE[:GREATER_EQUAL] : Token::TYPE[:GREATER])
-    when '/'
-      if second_char_match?('/')
-        while peek != "\n" && !is_at_end? # Note: "\n" != '\n'
-          advance
-        end
+    when "#" # I like Ruby style comments
+      advance while peek != "\n" && !at_end?
+    when "!"
+      add_token(second_char_match?("=") ? Token::TYPE[:BANG_EQUAL] : Token::TYPE[:BANG])
+    when "="
+      add_token(second_char_match?("=") ? Token::TYPE[:EQUAL_EQUAL] : Token::TYPE[:EQUAL])
+    when "<"
+      add_token(second_char_match?("=") ? Token::TYPE[:LESS_EQUAL] : Token::TYPE[:LESS])
+    when ">"
+      add_token(second_char_match?("=") ? Token::TYPE[:GREATER_EQUAL] : Token::TYPE[:GREATER])
+    when "/"
+      if second_char_match?("/")
+        advance while peek != "\n" && !at_end?
       else
         add_token(Token::TYPE[:SLASH])
       end
-    when ' ', "\r", "\t"
+    when " ", "\r", "\t"
       # no op
     when "\n"
       self.line += 1
@@ -101,7 +98,7 @@ class Scanner
   end
 
   def second_char_match?(expected)
-    return false if is_at_end?
+    return false if at_end?
     return false unless source[current] == expected
 
     self.current += 1
@@ -114,29 +111,29 @@ class Scanner
   end
 
   def string
-    while peek != '"' && !is_at_end?
+    while peek != '"' && !at_end?
       self.line += 1 if peek == "\n"
       advance
     end
 
-    Rlox.error(line, "Untemrinated string.") if is_at_end?
+    Rlox.error(line, "Untemrinated string.") if at_end?
 
     # closing "
     advance
 
     # trim the surrounding quotes
-    literal = source[(start+1)...(current-1)]
+    literal = source[(start + 1)...(current - 1)]
     add_token(Token::TYPE[:STRING], literal)
   end
 
   def number
-    advance while is_digit?(peek)
+    advance while digit?(peek)
 
-    if peek == '.' && is_digit?(peek(1))
+    if peek == "." && digit?(peek(1))
       # consume '.'
       advance
 
-      advance while is_digit?(peek)
+      advance while digit?(peek)
 
       add_token(Token::TYPE[:NUMBER], source[start...current].to_f)
     else
@@ -145,21 +142,21 @@ class Scanner
   end
 
   def identifier
-    advance while is_alphanumeric? peek
+    advance while alphanumeric? peek
 
     type_sym = Token::RESERVED_KEYWORD_LEXEME_TO_TYPE[source[start...current]] || :IDENTIFIER
     add_token(Token::TYPE[type_sym])
   end
 
-  def is_digit?(char)
-    char >= '0' && char <= '9'
+  def digit?(char)
+    char >= "0" && char <= "9"
   end
 
-  def is_alpha?(char)
-    (char >= 'a' && char <= 'z') || char >= 'A' && char <= 'Z' || char == '_'
+  def alpha?(char)
+    (char >= "a" && char <= "z") || char >= "A" && char <= "Z" || char == "_"
   end
 
-  def is_alphanumeric?(char)
-    is_digit?(char) || is_alpha?(char)
+  def alphanumeric?(char)
+    digit?(char) || alpha?(char)
   end
 end

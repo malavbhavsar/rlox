@@ -2,7 +2,7 @@
 
 class RloxRuntimeError < RuntimeError
   attr_reader :token
-  def initialize(token, msg=nil)
+  def initialize(token, msg = nil)
     @token = token
     super(msg)
   end

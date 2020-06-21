@@ -1,19 +1,19 @@
 # frozen_string_literal: true
 
-require 'readline'
-require 'singleton'
-require 'byebug'
+require "readline"
+require "singleton"
+require "byebug"
 
-require File.expand_path("../internals/util", __FILE__)
-require File.expand_path("../scanner", __FILE__)
-require File.expand_path("../token", __FILE__)
-require File.expand_path("../grammar", __FILE__)
-require File.expand_path("../ast", __FILE__)
-require File.expand_path("../parser", __FILE__)
-require File.expand_path("../environment", __FILE__)
-require File.expand_path("../ast_printer", __FILE__)
-require File.expand_path("../interpreter", __FILE__)
-require File.expand_path("../rlox_runtime_error", __FILE__)
+require File.expand_path("internals/util", __dir__)
+require File.expand_path("scanner", __dir__)
+require File.expand_path("token", __dir__)
+require File.expand_path("grammar", __dir__)
+require File.expand_path("ast", __dir__)
+require File.expand_path("parser", __dir__)
+require File.expand_path("environment", __dir__)
+require File.expand_path("ast_printer", __dir__)
+require File.expand_path("interpreter", __dir__)
+require File.expand_path("rlox_runtime_error", __dir__)
 
 class Rlox
   class HadError
@@ -50,11 +50,11 @@ class Rlox
   end
 
   def self.run_prompt
-    while true
+    loop do
       buffer = Readline.readline("> ", true)
       run(buffer)
       HadError.instance.value = false
-      HadRuntimeError.instance.value = false  # not needed to check during .run, but hey why not?
+      HadRuntimeError.instance.value = false # not needed to check during .run, but hey why not?
     end
   end
 
@@ -63,9 +63,9 @@ class Rlox
       token = line_or_token
       line = token.line
       where = if token.type == Token::TYPE[:EOF]
-        " at end"
-      else
-        " at '#{token.lexeme}'"
+                " at end"
+              else
+                " at '#{token.lexeme}'"
       end
     else
       line = line_or_token
@@ -76,7 +76,7 @@ class Rlox
   end
 
   def self.runtime_error(error)
-    self.report(error.token.line,"", error.message)
+    report(error.token.line, "", error.message)
     HadRuntimeError.instance.value = true
   end
 
