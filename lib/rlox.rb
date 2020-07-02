@@ -13,6 +13,9 @@ require File.expand_path("parser", __dir__)
 require File.expand_path("environment", __dir__)
 require File.expand_path("ast_printer", __dir__)
 require File.expand_path("interpreter", __dir__)
+require File.expand_path("rlox_callable", __dir__)
+require File.expand_path("rlox_function", __dir__)
+require File.expand_path("return", __dir__)
 require File.expand_path("rlox_runtime_error", __dir__)
 
 class Rlox

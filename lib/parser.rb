@@ -23,6 +23,7 @@ class Parser
   ####################################
 
   def declaration
+    return function_declaration("function") if match(Token::TYPE[:FUN])
     return var_declaration if match(Token::TYPE[:VAR])
 
     statement
@@ -30,6 +31,26 @@ class Parser
     puts "error happened #{e}. TODO: implement synchronize"
     # synchronize # TODO: implement synchronize method
     nil
+  end
+
+  def function_declaration(kind)
+    name = consume(Token::TYPE[:IDENTIFIER], "Expect #{kind} name.")
+
+    parameters = []
+    consume(Token::TYPE[:LEFT_PAREN], "Expect '(' after #{kind} name.")
+    unless check(Token::TYPE[:RIGHT_PAREN])
+      loop do
+        error(peek, "Cannot have more than 255 parameters.") if parameters.length >= 255
+        parameters << consume(Token::TYPE[:IDENTIFIER], "Expect parameter name.")
+        break unless match(Token::TYPE[:COMMA])
+      end
+    end
+    consume(Token::TYPE[:RIGHT_PAREN] ,"Expect ')' after parameters.")
+
+    consume(Token::TYPE[:LEFT_BRACE] ,"Expect '{' before #{kind} body.")
+    body = block
+
+    Stmt::Function.new(name, parameters, body)
   end
 
   def var_declaration
@@ -45,8 +66,9 @@ class Parser
     return for_statement if match(Token::TYPE[:FOR])
     return if_statement if match(Token::TYPE[:IF])
     return print_statement if match(Token::TYPE[:PRINT])
+    return return_statement if match(Token::TYPE[:RETURN])
     return while_statement if match(Token::TYPE[:WHILE])
-    return block_statement if match(Token::TYPE[:LEFT_BRACE])
+    return Stmt::Block.new(block) if match(Token::TYPE[:LEFT_BRACE])
 
     expression_statement
   end
@@ -96,6 +118,15 @@ class Parser
     Stmt::Print.new(value)
   end
 
+  def return_statement
+    keyword = previous
+    value = nil
+    value = expression unless check(Token::TYPE[:SEMICOLON])
+    consume(Token::TYPE[:SEMICOLON], "Expect ';' return value.")
+
+    Stmt::Return.new(keyword, value)
+  end
+
   def while_statement
     consume(Token::TYPE[:LEFT_PAREN], "Expect '(' after 'while'.")
     condition = expression
@@ -105,14 +136,14 @@ class Parser
     Stmt::While.new(condition, body)
   end
 
-  def block_statement
+  def block
     statements = []
 
     statements.push(declaration) while !check(Token::TYPE[:RIGHT_BRACE]) && !at_end?
 
     consume(Token::TYPE[:RIGHT_BRACE], "Expect '}' after block.")
 
-    Stmt::Block.new(statements)
+    statements
   end
 
   def expression_statement
@@ -220,8 +251,36 @@ class Parser
       right = unary
       Expr::Unary.new(operator, right)
     else
-      primary
+      rlox_call
     end
+  end
+
+  def rlox_call # trying to stay away from #call on block, procs, lambdas. Not actually sure that this matters
+    expr = primary
+    while true
+      if match(Token::TYPE[:LEFT_PAREN])
+        expr = finish_rlox_call(expr)
+      else
+        break
+      end
+    end
+    expr
+  end
+
+  def finish_rlox_call(callee)
+    arguments = []
+
+    unless check(Token::TYPE[:RIGHT_PAREN])
+      loop do
+        error(peek, "Cannot have more than 255 arguments.") if arguments.length >= 255
+        arguments << expression
+        break unless match(Token::TYPE[:COMMA])
+      end
+    end
+
+    paren = consume(Token::TYPE[:RIGHT_PAREN] ,"Expect ')' after arguments.")
+
+    Expr::Call.new(callee, paren, arguments)
   end
 
   def primary

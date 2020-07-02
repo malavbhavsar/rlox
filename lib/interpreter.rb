@@ -5,9 +5,11 @@ class Interpreter
   include Stmt::Visitor
 
   attr_accessor :environment
+  attr_accessor :globals
 
   def initialize
-    @environment = Environment.new
+    @globals = Environment.new
+    @environment = @globals
   end
 
   def interpret(statements)
@@ -26,22 +28,27 @@ class Interpreter
     expr.accept(self)
   end
 
-  def execute_block(statements)
-    previous = environment
-
-    self.environment = Environment.new(previous)
+  def execute_block(statements, previous_environment)
+    self.environment = Environment.new(previous_environment)
     statements.each { |statement| execute(statement) }
   ensure
-    self.environment = previous
+    self.environment = previous_environment
   end
 
   def visit_block_stmt(stmt)
-    execute_block(stmt.statements)
+    previous_environment = environment
+    execute_block(stmt.statements, previous_environment)
     nil
   end
 
   def visit_expression_stmt(stmt)
     evaluate(stmt.expression)
+  end
+
+  def visit_function_stmt(stmt)
+    function = RloxFunction.new(stmt)
+    environment.define(stmt.name.lexeme, function)
+    nil
   end
 
   def visit_if_stmt(stmt)
@@ -55,6 +62,13 @@ class Interpreter
   def visit_print_stmt(stmt)
     value = evaluate(stmt.expression)
     puts value
+  end
+
+  def visit_return_stmt(stmt)
+    value = nil
+    value = evaluate(stmt.value) unless stmt.value.nil?
+
+    raise Return.new(value)
   end
 
   def visit_var_stmt(stmt)
@@ -126,6 +140,23 @@ class Interpreter
     when Token::TYPE[:EQUAL_EQUAL]
       left == right
     end
+  end
+
+  def visit_call_expr(expr)
+    callee = evaluate(expr.callee)
+
+    arguments = expr.arguments.map do |argument|
+      evaluate(argument)
+    end
+
+    raise RloxRuntimeError.new(expr.paren, "Can only call functions and classes.") unless callee.is_a? RloxCallable
+    function = callee
+
+    unless function.arity == arguments.size
+      raise RloxRuntimeError.new(expr.paren, "Expected #{function.arity} arguments but got #{arguments.size}.")
+    end
+
+    function.call(self, arguments)
   end
 
   def visit_grouping_expr(expr)
