@@ -5,5 +5,5 @@ inherit_gem:
   rubocop-github:
     - config/default.yml
 
-inherit_from:
-  - .rubocop_overrides.yml
+Style/Documentation:
+  Enabled: false
