@@ -2,9 +2,11 @@
 
 class RloxFunction < RloxCallable
   attr_reader :declaration
+  attr_reader :closure
 
-  def initialize(declaration)
+  def initialize(declaration, closure)
     @declaration = declaration
+    @closure = closure
   end
 
   def arity
@@ -12,7 +14,8 @@ class RloxFunction < RloxCallable
   end
 
   def call(interpreter, arguments)
-    environment = Environment.new(interpreter.globals)
+    environment = Environment.new(closure)
+
     declaration.parameters.each_with_index do |parameter, index|
       environment.define(parameter.lexeme, arguments[index])
     end

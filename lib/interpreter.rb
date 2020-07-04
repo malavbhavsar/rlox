@@ -37,24 +37,24 @@ class Interpreter
     Rlox.runtime_error(e)
   end
 
-  def execute(stmt)
-    stmt.accept(self)
-  end
-
   def evaluate(expr)
     expr.accept(self)
   end
 
-  def execute_block(statements, previous_environment)
-    self.environment = Environment.new(previous_environment)
+  def execute(stmt)
+    stmt.accept(self)
+  end
+
+  def execute_block(statements, given_environment)
+    previous_environment = self.environment
+    self.environment = given_environment
     statements.each { |statement| execute(statement) }
   ensure
     self.environment = previous_environment
   end
 
   def visit_block_stmt(stmt)
-    previous_environment = environment
-    execute_block(stmt.statements, previous_environment)
+    execute_block(stmt.statements, Environment.new(self.environment))
     nil
   end
 
@@ -63,8 +63,8 @@ class Interpreter
   end
 
   def visit_function_stmt(stmt)
-    function = RloxFunction.new(stmt)
-    environment.define(stmt.name.lexeme, function)
+    function = RloxFunction.new(stmt, self.environment)
+    self.environment.define(stmt.name.lexeme, function)
     nil
   end
 
@@ -90,7 +90,7 @@ class Interpreter
 
   def visit_var_stmt(stmt)
     value = stmt.initializer ? evaluate(stmt.initializer) : nil
-    environment.define(stmt.name.lexeme, value)
+    self.environment.define(stmt.name.lexeme, value)
   end
 
   def visit_while_stmt(stmt)
@@ -101,7 +101,7 @@ class Interpreter
   def visit_assign_expr(expr)
     value = evaluate(expr.value)
 
-    environment.assign(expr.name, value)
+    self.environment.assign(expr.name, value)
     value
   end
 
@@ -210,7 +210,7 @@ class Interpreter
   end
 
   def visit_variable_expr(expr)
-    environment.get(expr.name)
+    self.environment.get(expr.name)
   end
 
   private

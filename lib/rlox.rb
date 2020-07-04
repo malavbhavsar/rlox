@@ -2,7 +2,7 @@
 
 require "readline"
 require "singleton"
-require "byebug"
+require "pry"
 
 require File.expand_path("internals/util", __dir__)
 require File.expand_path("scanner", __dir__)

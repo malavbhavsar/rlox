@@ -3,13 +3,6 @@
 require "spec_helper"
 require "open3"
 
-# expected_error_pattern = RegExp(r"// (Error.*)");
-# error_line_pattern = RegExp(r"// \[((java|c) )?line (\d+)\] (Error.*)");
-# expected_runtime_error_pattern = RegExp(r"// expect runtime error: (.+)");
-# syntax_error_pattern = RegExp(r"\[.*line (\d+)\] (Error.+)");
-# stack_trace_pattern = RegExp(r"\[line (\d+)\]");
-# non_test_pattern = RegExp(r"// nontest");
-
 def parse_file(file)
   expected_output_pattern = /\/\/ expect: ?(.*)/
   expected_error_pattern = /\/\/ (Error.*)/
