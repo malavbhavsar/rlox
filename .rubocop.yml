@@ -1,9 +1,2 @@
-# On github, we are using github actions which default to using their
-# preferred set of rules. IMO, rubocop defaults are good, but let's
-# try this.
-inherit_gem:
-  rubocop-github:
-    - config/default.yml
-
 Style/Documentation:
   Enabled: false
