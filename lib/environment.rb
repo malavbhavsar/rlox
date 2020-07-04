@@ -19,7 +19,7 @@ class Environment
       return nil # necessary?
     end
 
-    raise RloxRuntimeError.new(token, "Undefined variable #{token.lexeme}.")
+    raise RloxRuntimeError.new(token, "Undefined variable '#{token.lexeme}'.")
   end
 
   def define(name, value)
@@ -31,6 +31,6 @@ class Environment
 
     return enclosing.get(token) unless enclosing.nil?
 
-    raise RloxRuntimeError.new(token, "Undefined variable #{token.lexeme}.")
+    raise RloxRuntimeError.new(token, "Undefined variable '#{token.lexeme}'.")
   end
 end

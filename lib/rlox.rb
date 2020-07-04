@@ -97,6 +97,6 @@ class Rlox
   end
 
   private_class_method def self.report(line, where, message)
-    puts "[line #{line}] Error#{where}: #{message}"
+    STDERR.puts "[line #{line}] Error#{where}: #{message}"
   end
 end

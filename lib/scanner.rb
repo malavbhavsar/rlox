@@ -93,7 +93,7 @@ class Scanner
     when *ALPHAS
       identifier
     else
-      Rlox.error(line, "Unexpected character #{char}")
+      Rlox.error(line, "Unexpected character #{char}.")
     end
   end
 
@@ -116,7 +116,7 @@ class Scanner
       advance
     end
 
-    Rlox.error(line, "Untemrinated string.") if at_end?
+    Rlox.error(line, "Unterminated string.") if at_end?
 
     # closing "
     advance

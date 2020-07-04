@@ -4,6 +4,8 @@ source "https://rubygems.org"
 
 git_source(:github) { |repo_name| "https://github.com/#{repo_name}" }
 
+gem "pry-byebug"
+
 gem "rake"
 gem "rspec"
 gem "rubocop", "~> 0.74.0"

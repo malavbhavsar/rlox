@@ -10,6 +10,23 @@ class Interpreter
   def initialize
     @globals = Environment.new
     @environment = @globals
+
+    clock = RloxCallable.new
+    clock.instance_eval do
+      def arity
+        0
+      end
+
+      def call(_interpreter, _arguments)
+        Time.now.to_i
+      end
+
+      def to_s
+        '<native fn>'
+      end
+    end
+
+    @globals.define('clock', clock)
   end
 
   def interpret(statements)
@@ -61,7 +78,7 @@ class Interpreter
 
   def visit_print_stmt(stmt)
     value = evaluate(stmt.expression)
-    puts value
+    puts stringify(value)
   end
 
   def visit_return_stmt(stmt)
@@ -128,7 +145,7 @@ class Interpreter
         return left + right
       end
 
-      raise RloxRuntimeError.new(operator, "Operands must be numbers.")
+      raise RloxRuntimeError.new(operator, "Operands must be two numbers or two strings.")
     when Token::TYPE[:SLASH]
       check_number_operands(operator, left, right)
       left / right
@@ -201,10 +218,26 @@ class Interpreter
   def check_number_operands(operator, *operands)
     return if operands.all? { |operand| operand.is_a?(Integer) || operand.is_a?(Float) }
 
-    raise RloxRuntimeError.new(operator, "Operands must be numbers.")
+    msg = operands.length > 1 ? 'Operands must be numbers.' : 'Operand must be a number.'
+    raise RloxRuntimeError.new(operator, msg)
   end
 
   def truthy?(val)
     !!val # Lox follows Ruby's rule for truthiness
+  end
+
+  def stringify(val)
+    return "nil" if val.nil?
+
+    # Hack. Work around Ruby adding ".0" to integer-valued doubles.
+    if val.is_a? Numeric
+      text = val.to_s
+      if text.end_with?(".0")
+        text = text[0...-2]
+        return text
+      end
+    end
+
+    return val.to_s
   end
 end

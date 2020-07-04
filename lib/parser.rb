@@ -28,8 +28,7 @@ class Parser
 
     statement
   rescue ParseError => e
-    puts "error happened #{e}. TODO: implement synchronize"
-    # synchronize # TODO: implement synchronize method
+    synchronize
     nil
   end
 
@@ -203,7 +202,7 @@ class Parser
       operator = previous
       right = equality
 
-      expr = Expr::Logical(expr, operator, right)
+      expr = Expr::Logical.new(expr, operator, right)
     end
 
     expr
@@ -344,5 +343,26 @@ class Parser
     Rlox.error(token, message)
 
     ParseError.new
+  end
+
+  def synchronize
+    advance
+
+    while !at_end?
+      return if previous.type == Token::TYPE[:SEMICOLON]
+
+      return if [
+        Token::TYPE[:CLASS],
+        Token::TYPE[:FUN],
+        Token::TYPE[:VAR],
+        Token::TYPE[:FOR],
+        Token::TYPE[:IF],
+        Token::TYPE[:WHILE],
+        Token::TYPE[:PRINT],
+        Token::TYPE[:RETURN],
+      ].include?(peek.type)
+
+      advance
+    end
   end
 end
